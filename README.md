@@ -24,13 +24,26 @@ browser ──► <ip>:30000  (gentle-remote relay: login, session cookie, allow
 
 ## Install
 
+With the Gentle Shell launcher (installs into Gentle Shell's own home):
+
 ```bash
-pi install git:github.com/AncientGear/gs-remote-design
-# or, from a local clone:
-pi install ./gs-remote-design
+gentle-shell install git:github.com/AncientGear/gs-remote-design
 ```
 
-Requires Node `^22.19.0 || >=23.6.0` and Gentle Shell with gentle-design.
+`gentle-shell install <source>` runs Pi's `pi install <source>` against the Gentle Shell home (the isolated home by
+default, or your Pi home with `--link`). A plain `pi install ...` installs into the Pi home instead, which Gentle Shell
+does not read unless you use `--link`. Restart Gentle Shell afterwards; `/gentle:remote` should then appear.
+
+Other sources:
+
+```bash
+gentle-shell install git:github.com/AncientGear/gs-remote-design@v0.1.0   # a pinned tag
+gentle-shell install ./gs-remote-design                                 # a local clone
+gentle-shell update git:github.com/AncientGear/gs-remote-design          # update
+gentle-shell remove git:github.com/AncientGear/gs-remote-design          # uninstall
+```
+
+Requires Node `^22.19.0 || >=23.6.0` and Gentle Shell with gentle-design. The package has no runtime dependencies.
 
 ## Usage
 
