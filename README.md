@@ -76,6 +76,11 @@ server. **Anyone who signs in can direct the agent.** Choose the password accord
 - Artboard files (`files/*`, `system.html`, `assets/inspector.js`) run in a sandboxed opaque origin that browsers do
   not send cookies from. Those read-only paths are served without the cookie and are guarded only by the canvas'
   random token. Everything else requires a session.
+- **Behind a reverse proxy** every client reaches the relay from `127.0.0.1`, so the per-IP lockout is shared: someone
+  failing 5 logins also locks you out for 15 minutes. `X-Forwarded-For` is not trusted.
+- The relay does not pin the `Host` header (so it works with any IP or DNS name). A DNS-rebinding page can reach it
+  but holds no session cookie, so it only gets the token-guarded artboard files described above; restrict exposure
+  with `allow` or `bind` when that matters.
 - **Plain HTTP:** without TLS, the password and the cookie travel unencrypted. Use it on a LAN or VPN, restrict it with
   `allow`, or put an HTTPS reverse proxy in front (Caddy: `reverse_proxy 127.0.0.1:30000`, with
   `/gentle:remote bind 127.0.0.1`).

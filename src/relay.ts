@@ -268,7 +268,8 @@ export async function startRelay(options: RelayOptions): Promise<Relay> {
 	function forward(req: IncomingMessage, res: ServerResponse, target: CanvasTarget): void {
 		const canvasOrigin = `http://127.0.0.1:${target.port}`;
 		const headers: IncomingHttpHeaders = { ...req.headers };
-		for (const name of [...HOP_BY_HOP, "cookie", "x-forwarded-for", "x-forwarded-proto", "x-forwarded-host", "forwarded"]) delete headers[name];
+		const listed = String(req.headers.connection ?? "").split(",").map((name) => name.trim().toLowerCase()).filter(Boolean);
+		for (const name of [...HOP_BY_HOP, ...listed, "cookie", "x-forwarded-for", "x-forwarded-proto", "x-forwarded-host", "forwarded"]) delete headers[name];
 		headers.host = `127.0.0.1:${target.port}`;
 		if (req.headers.origin !== undefined && req.headers.origin !== "null") headers.origin = canvasOrigin;
 		const visible = publicOrigin(req);

@@ -290,3 +290,29 @@ test("the no-cookie artboard exemption never forwards dot segments or encoded se
 	}
 	assert.equal(seen.length, 0);
 });
+
+test("headers named in Connection are hop-by-hop and never reach the canvas", async () => {
+	const r = await relay();
+	const cookie = await login(r);
+	seen = [];
+	await call(r, "GET", `/${TOKEN}/`, { Cookie: cookie, Connection: "keep-alive, X-Secret", "X-Secret": "nope", "X-Kept": "yes" });
+	assert.equal(seen[0].headers["x-secret"], undefined);
+	assert.equal(seen[0].headers["x-kept"], "yes");
+});
+
+test("rotating X-Forwarded-For does not bypass the per-IP lockout", async () => {
+	const r = await relay();
+	const statuses: number[] = [];
+	for (let i = 0; i < 6; i++) statuses.push((await call(r, "POST", "/__remote/login", { ...FORM, "X-Forwarded-For": `203.0.113.${i}` }, form("saul", "nope-nope"))).status);
+	assert.deepEqual(statuses, [401, 401, 401, 401, 401, 429]);
+	assert.equal((await call(r, "POST", "/__remote/login", { ...FORM, "X-Forwarded-For": "198.51.100.1" }, form("saul", "s3cret-pass"))).status, 429);
+});
+
+test("double-encoded paths and absolute-form request lines stay unauthenticated", async () => {
+	const r = await relay();
+	seen = [];
+	for (const path of [`/${TOKEN}/files/x/../../api/designs`, `http://evil/${TOKEN}/api/designs`]) assert.equal((await call(r, "GET", path)).status, 401, path);
+	await call(r, "GET", `/${TOKEN}/files/%252e%252e%252fapi`);
+	// Only the single-encoded file name may reach the canvas, still inside files/ (the canvas answers 404 for it).
+	assert.deepEqual(seen.map((s) => s.url), [`/${TOKEN}/files/%252e%252e%252fapi`]);
+});
