@@ -1,0 +1,21 @@
+{
+  "name": "gs-remote-design",
+  "version": "0.1.0",
+  "description": "Gentle Shell extension: reach the gentle-design canvas from another machine through a password-protected port.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["pi-package", "gentle-shell", "gentle-design"],
+  "pi": {
+    "extensions": ["./extensions"]
+  },
+  "files": ["extensions", "src", "README.md"],
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.ts"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=1.2.0"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=23.6.0"
+  }
+}
