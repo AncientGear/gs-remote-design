@@ -24,7 +24,7 @@ Decisions agreed in conversation (not user quotes):
 - T2 [S3,S5,D3,D4] Relay HTTP server: login, sessions, rate limit, allow list, proxy with Host/Origin/CSP rewrite, SSE — inline — commit: cfa42da
 - T3 [S1,S4,D4] Extension: `/gentle:remote` command, canvas discovery via design service channel, lifecycle — inline — commit: af7d015
 - T4 [S2,D5] README: install, usage, firewall/provider notes, security — inline — commit: 23f1421
-- T5 [all] Independent verify (security high-risk) — gentle-ai-verify — evidence: pending
+- T5 [all] Verify — inline (independent verifier launch was refused by the runtime) — evidence: 42 tests green; integration script against the real upstream startDesignCanvasServer (.ref 116821b) behind startRelay: canvas page 200, api 200, artboard 200 with CSP rewritten to the relay origin, inspector.js without cookie 200, comment POST 202 and delivered, SSE text/event-stream, path tricks unauthenticated 401/404; hardening commit for dot segments
 
 Delivery slices: slice 1 = T1+T2 (5c608df..cfa42da, ~875 lines; the relay and its auth are one security unit, reviewed alone); slice 2 = T3+T4 (af7d015 + README commit; extension command + docs). One PR with both slices as separate commits; reviewers can read commit by commit.
 
@@ -36,3 +36,4 @@ Delivery slices: slice 1 = T1+T2 (5c608df..cfa42da, ~875 lines; the relay and it
 - L4. "lo que si, podemos agregar una capa, configurada en el mismo :remote agregar un tema de usuario y contraseña que se pida cuando se ingrese por primera vez"
 - L5. Repo: https://github.com/AncientGear/gs-remote-design (commits, PRs and push configured).
 - L6. Exploration: design service channel `gentle:desktop:design-service` exposes url()/observe() but no open(); canvas checks Host (421), Origin on POST (403), artboard CSP frame-ancestors/default-src name loopback; artboard subresources (files/*, system.html, assets/inspector.js) load from an opaque origin.
+- L7. Inline integration check found unauthenticated `/<token>/files/../api/...` was forwarded (canvas answered 404, no data); the relay now refuses dot segments and encoded separators in the no-cookie exemption.

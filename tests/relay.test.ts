@@ -281,3 +281,12 @@ test("update applies a new password and allow list on the open port; credentials
 	r.update({ allow: ["10.0.0.0/8"] });
 	assert.equal((await call(r, "GET", "/__remote/login")).status, 403);
 });
+
+test("the no-cookie artboard exemption never forwards dot segments or encoded separators", async () => {
+	const r = await relay();
+	seen = [];
+	for (const path of [`/${TOKEN}/files/../api/designs`, `/${TOKEN}/files/%2e%2e/api/designs`, `/${TOKEN}/files/demo%2F..%2F..%2Fapi`, `/${TOKEN}/files/demo/..%5Capi`, `/${TOKEN}/files//a.html`]) {
+		assert.equal((await call(r, "GET", path)).status, 401, path);
+	}
+	assert.equal(seen.length, 0);
+});

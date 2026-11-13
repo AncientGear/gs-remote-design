@@ -251,6 +251,17 @@ export async function startRelay(options: RelayOptions): Promise<Relay> {
 
 	/** Paths an artboard loads from its opaque (sandboxed) origin, which sends no cookie; the canvas token guards them. */
 	function artboardSubresource(rest: string[]): boolean {
+		// Dot segments and encoded separators never qualify, so a path cannot climb out of files/ to the API.
+		const clean = rest.every((segment) => {
+			let decoded: string;
+			try {
+				decoded = decodeURIComponent(segment);
+			} catch {
+				return false;
+			}
+			return decoded !== "" && decoded !== "." && decoded !== ".." && !/[\\/]/.test(decoded);
+		});
+		if (!clean) return false;
 		return rest[0] === "files" || (rest.length === 1 && rest[0] === "system.html") || (rest.length === 2 && rest[0] === "assets" && rest[1] === "inspector.js");
 	}
 
