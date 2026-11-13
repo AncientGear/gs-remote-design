@@ -31,6 +31,8 @@ export type Relay = {
 	/** Signs every browser out (password change, `/gentle:remote logout-all`). */
 	endSessions(): void;
 	sessionCount(): number;
+	/** Applies new credentials, allow list or session length without closing the port; a credential change signs everyone out. */
+	update(changes: Partial<Pick<RelayOptions, "username" | "passwordHash" | "allow" | "sessionHours">>): void;
 };
 
 const COOKIE = "gsr_session";
@@ -144,9 +146,10 @@ async function readBody(req: IncomingMessage, limit: number): Promise<string | u
 
 export async function startRelay(options: RelayOptions): Promise<Relay> {
 	if (!options.username || !options.passwordHash) throw new Error("a username and a password are required before the remote port opens");
+	options = { ...options, allow: [...options.allow] };
 	const now = options.now ?? Date.now;
-	const sessionMs = options.sessionHours * 3600_000;
-	const usernameDigest = sha256(options.username);
+	let sessionMs = options.sessionHours * 3600_000;
+	let usernameDigest = sha256(options.username);
 	const sessions = new Map<string, number>();
 	const failures = new Map<string, { count: number; until: number }>();
 
@@ -325,5 +328,19 @@ export async function startRelay(options: RelayOptions): Promise<Relay> {
 			})),
 		endSessions: () => sessions.clear(),
 		sessionCount: () => sessions.size,
+		update(changes) {
+			const credentials = (changes.username !== undefined && changes.username !== options.username) || (changes.passwordHash !== undefined && changes.passwordHash !== options.passwordHash);
+			if (changes.username !== undefined) {
+				options.username = changes.username;
+				usernameDigest = sha256(changes.username);
+			}
+			if (changes.passwordHash !== undefined) options.passwordHash = changes.passwordHash;
+			if (changes.allow !== undefined) options.allow = [...changes.allow];
+			if (changes.sessionHours !== undefined) {
+				options.sessionHours = changes.sessionHours;
+				sessionMs = changes.sessionHours * 3600_000;
+			}
+			if (credentials) sessions.clear();
+		},
 	};
 }

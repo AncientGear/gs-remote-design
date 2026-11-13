@@ -268,3 +268,16 @@ test("a port already in use is reported, not ignored", async () => {
 	const r = await relay();
 	await assert.rejects(relay({ port: r.port }), /EADDRINUSE/);
 });
+
+test("update applies a new password and allow list on the open port; credentials sign everyone out", async () => {
+	const r = await relay();
+	const cookie = await login(r);
+	r.update({ allow: ["127.0.0.1"] });
+	assert.equal((await call(r, "GET", "/", { Cookie: cookie })).headers.location, `/${TOKEN}/`);
+	r.update({ passwordHash: await hashPassword("n3w-password") });
+	assert.equal(r.sessionCount(), 0);
+	assert.equal((await call(r, "POST", "/__remote/login", FORM, form("saul", "s3cret-pass"))).status, 401);
+	assert.equal((await call(r, "POST", "/__remote/login", FORM, form("saul", "n3w-password"))).status, 303);
+	r.update({ allow: ["10.0.0.0/8"] });
+	assert.equal((await call(r, "GET", "/__remote/login")).status, 403);
+});
