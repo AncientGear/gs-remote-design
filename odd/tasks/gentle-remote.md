@@ -23,7 +23,7 @@ Decisions agreed in conversation (not user quotes):
 - T1 [S1,S5,D2] Package scaffold, config store, scrypt password — inline — commit: 5c608df
 - T2 [S3,S5,D3,D4] Relay HTTP server: login, sessions, rate limit, allow list, proxy with Host/Origin/CSP rewrite, SSE — inline — commit: cfa42da
 - T3 [S1,S4,D4] Extension: `/gentle:remote` command, canvas discovery via design service channel, lifecycle — inline — commit: af7d015
-- T4 [S2,D5] README: install, usage, firewall/provider notes, security — inline — commit: (this commit)
+- T4 [S2,D5] README: install, usage, firewall/provider notes, security — inline — commit: 23f1421
 - T5 [all] Independent verify (security high-risk) — gentle-ai-verify — evidence: pending
 
 Delivery slices: slice 1 = T1+T2 (5c608df..cfa42da, ~875 lines; the relay and its auth are one security unit, reviewed alone); slice 2 = T3+T4 (af7d015 + README commit; extension command + docs). One PR with both slices as separate commits; reviewers can read commit by commit.
