@@ -1,5 +1,14 @@
 # gs-remote-design
 
+<p>
+  <a href="https://github.com/Gentleman-Programming/gentle-shell"><img src="https://raw.githubusercontent.com/Gentleman-Programming/gentle-shell/main/assets/gentle-logo-only.png" width="28" height="28" alt="gentle-shell logo" align="absmiddle"></a>
+  Built with <a href="https://github.com/Gentleman-Programming/gentle-shell">gentle-shell</a>.
+</p>
+
+> Independent community extension. It is not an official gentle-shell project and is not endorsed by its maintainers.
+> The gentle-shell name and logo belong to their owner; see the
+> [gentle-shell trademark policy](https://github.com/Gentleman-Programming/gentle-shell/blob/main/TRADEMARKS.md).
+
 A [Gentle Shell](https://github.com/Gentleman-Programming/gentle-shell) extension for viewing the **gentle-design** canvas
 from another machine when Gentle Shell runs remotely (homelab, VPS, AWS or any other server).
 
