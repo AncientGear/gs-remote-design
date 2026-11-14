@@ -36,23 +36,29 @@ browser ──► <ip>:30000  (gentle-remote relay: login, session cookie, allow
 With the Gentle Shell launcher (installs into Gentle Shell's own home):
 
 ```bash
-gentle-shell install git:github.com/AncientGear/gs-remote-design
+gentle-shell install https://github.com/AncientGear/gs-remote-design
 ```
 
-`gentle-shell install <source>` runs Pi's `pi install <source>` against the Gentle Shell home (the isolated home by
-default, or your Pi home with `--link`). A plain `pi install ...` installs into the Pi home instead, which Gentle Shell
-does not read unless you use `--link`. Restart Gentle Shell afterwards; `/gentle:remote` should then appear.
+Restart Gentle Shell afterwards; `/gentle:remote` then appears (`/gentle:remote help` lists the subcommands).
 
-Other sources:
+`gentle-shell install <source>` runs Pi's `pi install <source>` against the Gentle Shell home: the isolated home by
+default, `--link` for your Pi home, or `--home <dir>`. Use the same home selector you launch with, before the
+subcommand (`gentle-shell --link install ...`). A plain `pi install ...` installs into the Pi home, which Gentle Shell
+does not read unless you launch it with `--link`.
+
+Other sources and package commands:
 
 ```bash
-gentle-shell install git:github.com/AncientGear/gs-remote-design@v0.1.0   # a pinned tag
-gentle-shell install ./gs-remote-design                                 # a local clone
-gentle-shell update git:github.com/AncientGear/gs-remote-design          # update
-gentle-shell remove git:github.com/AncientGear/gs-remote-design          # uninstall
+gentle-shell install git:github.com/AncientGear/gs-remote-design            # same as the URL
+gentle-shell install git:github.com/AncientGear/gs-remote-design@<tag|branch> # pin a ref
+gentle-shell install ./gs-remote-design                                       # a local clone
+gentle-shell list                                                             # check it is installed
+gentle-shell update git:github.com/AncientGear/gs-remote-design               # update
+gentle-shell remove git:github.com/AncientGear/gs-remote-design               # uninstall
 ```
 
-Requires Node `^22.19.0 || >=23.6.0` and Gentle Shell with gentle-design. The package has no runtime dependencies.
+A git install clones the repository into the home and runs `npm install` there, so `git` and `npm` must be on `PATH`.
+The package has no runtime dependencies. A source pinned with `@<ref>` stays on that ref when updated.
 
 ## Usage
 
@@ -121,5 +127,7 @@ server. **Anyone who signs in can direct the agent.** Choose the password accord
 ## Development
 
 ```bash
-npm test     # node --experimental-strip-types --test tests/*.test.ts
+npm test     # node --experimental-strip-types --test tests/*.test.ts (Node >= 22.6)
 ```
+
+Gentle Shell loads the TypeScript sources directly; there is no build step.
