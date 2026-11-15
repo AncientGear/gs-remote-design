@@ -125,7 +125,8 @@ export default function gentleRemote(pi: ExtensionAPI, deps: GentleRemoteDeps = 
 				passwordHash: config.passwordHash!,
 				allow: config.allow,
 				sessionHours: config.sessionHours,
-				target: () => targetFromCanvasUrl(canvasUrl),
+				// The stable canvas may omit an open event when xdg-open is unavailable.
+				target: () => targetFromCanvasUrl(service ? service.url() : canvasUrl),
 			});
 			relayFor = { bind, port: config.port };
 		} catch (error) {
@@ -150,7 +151,7 @@ export default function gentleRemote(pi: ExtensionAPI, deps: GentleRemoteDeps = 
 			`  listen: ${bind}:${config.port}`,
 			`  user: ${config.username ?? "(not set)"} · password: ${config.passwordHash ? "set" : "(not set)"}`,
 			`  allow: ${config.allow.length > 0 ? config.allow.join(", ") : "any IP"}`,
-			`  canvas: ${targetFromCanvasUrl(canvasUrl) ? "open" : `closed (open it with /gentle:design)`}`,
+			`  canvas: ${targetFromCanvasUrl(service ? service.url() : canvasUrl) ? "open" : `closed (open it with /gentle:design)`}`,
 			...(relay ? [`  open in your browser: ${urls.join("  ")}`, `  sessions: ${relay.sessionCount()}`] : []),
 			...(relay
 				? [

@@ -26,7 +26,8 @@ browser ──► <ip>:30000  (gentle-remote relay: login, session cookie, allow
 
 - The canvas keeps listening only on `127.0.0.1`, on its own random port, exactly as Gentle Shell ships it.
 - The extension finds the canvas through gentle-design's design service (`gentle:desktop:design-service`) and follows it
-  when it is reopened on a new port or token.
+  when it is reopened on a new port or token. It reads the service's current URL for each request, including on headless
+  servers where a failed desktop browser launch can omit an open notification.
 - Signed-in requests are forwarded with the `Host` and `Origin` the canvas expects. The canvas `Content-Security-Policy`
   is rewritten from the loopback origin to the address your browser used, so artboards still render inside the canvas.
 - The live-reload stream is relayed without buffering.
@@ -100,7 +101,9 @@ server. **Anyone who signs in can direct the agent.** Choose the password accord
 - Sessions use a random `HttpOnly`, `SameSite=Lax` cookie (12 hours). The cookie is `Secure` behind an HTTPS proxy
   that sends `X-Forwarded-Proto: https`.
 - After 5 failed logins, an IP is locked out for 15 minutes.
-- POSTs from another origin are rejected, both for the login form and for canvas actions.
+- POSTs from another origin are rejected, both for the login form and for canvas actions. Relay pages use a
+  `same-origin` referrer policy so native browser login/logout forms preserve their origin without leaking referrers
+  to other sites; opaque (`null`) origins remain rejected.
 - Artboard files (`files/*`, `system.html`, `assets/inspector.js`) run in a sandboxed opaque origin that browsers do
   not send cookies from. Those read-only paths are served without the cookie and are guarded only by the canvas'
   random token. Everything else requires a session.

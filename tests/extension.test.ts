@@ -64,6 +64,7 @@ function fakeDesignOwner(pi: ReturnType<typeof fakePi>["pi"]) {
 		});
 	});
 	return {
+		setUrlWithoutTransition(next: string | undefined) { url = next; },
 		open(next: string) {
 			url = next;
 			for (const cb of observers) cb({ transition: "open", running: true, slug: null, connectedClients: 0, url: next });
@@ -195,6 +196,19 @@ test("a signed-in browser reaches the canvas the design service reports, and fol
 	assert.equal((await call(s.port, "GET", "/", { Cookie: cookie })).status, 503);
 	const status = await s.run("");
 	assert.match(status.at(-1)!.message, /canvas: closed/i);
+});
+
+test("headless canvas URL changes are visible without transition notifications", async () => {
+	const s = await configured();
+	await s.run("on");
+	const login = await call(s.port, "POST", "/__remote/login", FORM, loginForm("s3cret-pass"));
+	const cookie = String(login.headers["set-cookie"]?.[0]).split(";")[0];
+	s.owner.setUrlWithoutTransition(`http://127.0.0.1:4100/${TOKEN}/d/demo/`);
+	assert.equal((await call(s.port, "GET", "/", { Cookie: cookie })).headers.location, `/${TOKEN}/`);
+	assert.match((await s.run("")).at(-1)!.message, /canvas: open/i);
+	s.owner.setUrlWithoutTransition(undefined);
+	assert.equal((await call(s.port, "GET", "/", { Cookie: cookie })).status, 503);
+	assert.match((await s.run("")).at(-1)!.message, /canvas: closed/i);
 });
 
 test("changing the password signs every browser out; logout-all does too", async () => {
