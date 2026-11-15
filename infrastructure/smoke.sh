@@ -13,7 +13,7 @@ export AWS_IGNORE_CONFIGURED_ENDPOINT_URLS=true
 # Do not let inherited LocalStack/static credentials override the selected profile.
 unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_SECURITY_TOKEN
 export AWS_PROFILE=ahau-2026 AWS_REGION=us-east-1
-for tool in terraform aws ssh scp ssh-keygen node npm curl tar; do command -v "$tool" >/dev/null; done
+for tool in terraform aws ssh scp ssh-keygen node npm curl tar timeout; do command -v "$tool" >/dev/null; done
 [[ $(curl -fsS --max-time 15 https://checkip.amazonaws.com) == 189.215.51.112 ]] || { echo 'Egress IP mismatch' >&2; exit 1; }
 aws sts get-caller-identity --profile ahau-2026 --region us-east-1 --query Account --output text >/dev/null
 mkdir -p .runs
@@ -29,7 +29,7 @@ cleanup() {
   trap - EXIT INT TERM
   if (( managed )); then
     if [[ -n ${ip:-} ]]; then
-      ssh "${ssh_opts[@]}" "ubuntu@$ip" 'cat ~/smoke/rpc.log' >"$run/rpc.log" 2>&1 || true
+      timeout --kill-after=5s 15s ssh "${ssh_opts[@]}" "ubuntu@$ip" 'cat ~/smoke/rpc.log' >"$run/rpc.log" 2>&1 || true
     fi
     if terraform -chdir="$run" destroy -auto-approve -input=false -no-color >"$run/destroy.log" 2>&1; then
       terraform -chdir="$run" state list >"$run/remaining-state.txt"
