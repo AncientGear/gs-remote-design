@@ -1,5 +1,7 @@
 # gs-remote-design
 
+**English** · [Español](README.es.md)
+
 <p>
   <a href="https://github.com/Gentleman-Programming/gentle-shell"><img src="https://raw.githubusercontent.com/Gentleman-Programming/gentle-shell/main/assets/gentle-logo-only.png" width="28" height="28" alt="gentle-shell logo" align="absmiddle"></a>
   Built with <a href="https://github.com/Gentleman-Programming/gentle-shell">gentle-shell</a>.
@@ -14,6 +16,10 @@ from another machine when Gentle Shell runs remotely (homelab, VPS, AWS or any o
 
 You choose a port, for example `30000`, and open `http://<ip-or-host>:30000/` in your browser. The first visit asks for a
 username and password. No SSH tunnel, VPN client or third-party service is required.
+
+<p align="center">
+  <img src="docs/images/login.png" width="600" alt="gs-remote-design sign-in page asking for a username and password">
+</p>
 
 ## How it works
 
